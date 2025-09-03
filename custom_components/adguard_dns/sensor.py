@@ -73,39 +73,52 @@ class AdGuardDNSSensor(CoordinatorEntity[AdGuardDNSDataUpdateCoordinator], Senso
             return None
 
         if self._sensor_type == "total_queries":
-            stats_time = self.coordinator.data.get("stats_time", {})
-            return sum(stats_time.get("time_units", {}).values())
+            return self.coordinator.data.get("total_queries", 0)
         
         elif self._sensor_type == "blocked_queries":
-            stats_time = self.coordinator.data.get("stats_time", {})
-            time_units = stats_time.get("time_units", {})
-            blocked_units = stats_time.get("blocked_time_units", {})
-            return sum(blocked_units.values())
+            return self.coordinator.data.get("blocked_queries", 0)
         
         elif self._sensor_type == "blocked_percentage":
-            stats_time = self.coordinator.data.get("stats_time", {})
-            time_units = stats_time.get("time_units", {})
-            blocked_units = stats_time.get("blocked_time_units", {})
-            
-            total = sum(time_units.values())
-            blocked = sum(blocked_units.values())
-            
-            if total > 0:
-                return round((blocked / total) * 100, 2)
-            return 0
+            return self.coordinator.data.get("blocked_percentage", 0)
         
         elif self._sensor_type == "top_blocked_domain":
-            stats_domains = self.coordinator.data.get("stats_domains", {})
-            blocked_domains = stats_domains.get("blocked_domains", [])
+            # Get top blocked domain from devices data
+            devices_data = self.coordinator.data.get("devices", {})
+            devices_list = devices_data.get("devices", [])
+            
+            # Collect all blocked domains from all devices
+            blocked_domains = {}
+            for device in devices_list:
+                device_stats = device.get("statistics", {})
+                top_blocked = device_stats.get("top_blocked_domains", [])
+                for domain_info in top_blocked:
+                    domain = domain_info.get("domain", "")
+                    count = domain_info.get("count", 0)
+                    blocked_domains[domain] = blocked_domains.get(domain, 0) + count
+            
             if blocked_domains:
-                return blocked_domains[0].get("domain", "N/A")
+                top_domain = max(blocked_domains.items(), key=lambda x: x[1])
+                return top_domain[0]
             return "N/A"
         
         elif self._sensor_type == "top_queried_domain":
-            stats_domains = self.coordinator.data.get("stats_domains", {})
-            queried_domains = stats_domains.get("queried_domains", [])
+            # Get top queried domain from devices data
+            devices_data = self.coordinator.data.get("devices", {})
+            devices_list = devices_data.get("devices", [])
+            
+            # Collect all queried domains from all devices
+            queried_domains = {}
+            for device in devices_list:
+                device_stats = device.get("statistics", {})
+                top_queried = device_stats.get("top_queried_domains", [])
+                for domain_info in top_queried:
+                    domain = domain_info.get("domain", "")
+                    count = domain_info.get("count", 0)
+                    queried_domains[domain] = queried_domains.get(domain, 0) + count
+            
             if queried_domains:
-                return queried_domains[0].get("domain", "N/A")
+                top_domain = max(queried_domains.items(), key=lambda x: x[1])
+                return top_domain[0]
             return "N/A"
         
         return None
@@ -119,24 +132,54 @@ class AdGuardDNSSensor(CoordinatorEntity[AdGuardDNSDataUpdateCoordinator], Senso
         attributes = {}
         
         if self._sensor_type in ["total_queries", "blocked_queries", "blocked_percentage"]:
-            stats_time = self.coordinator.data.get("stats_time", {})
-            attributes["time_units"] = stats_time.get("time_units", {})
-            attributes["blocked_time_units"] = stats_time.get("blocked_time_units", {})
+            # Add device count and account limits info
+            devices_data = self.coordinator.data.get("devices", {})
+            devices_list = devices_data.get("devices", [])
+            attributes["active_devices"] = len(devices_list)
+            
+            account_limits = self.coordinator.data.get("account_limits", {})
+            attributes["account_limits"] = account_limits
         
         elif self._sensor_type == "top_blocked_domain":
-            stats_domains = self.coordinator.data.get("stats_domains", {})
-            blocked_domains = stats_domains.get("blocked_domains", [])
+            devices_data = self.coordinator.data.get("devices", {})
+            devices_list = devices_data.get("devices", [])
+            
+            # Collect all blocked domains from all devices
+            blocked_domains = {}
+            for device in devices_list:
+                device_stats = device.get("statistics", {})
+                top_blocked = device_stats.get("top_blocked_domains", [])
+                for domain_info in top_blocked:
+                    domain = domain_info.get("domain", "")
+                    count = domain_info.get("count", 0)
+                    blocked_domains[domain] = blocked_domains.get(domain, 0) + count
+            
             if blocked_domains:
-                top_domain = blocked_domains[0]
-                attributes["query_count"] = top_domain.get("query_count", 0)
-                attributes["top_10_blocked"] = [d.get("domain") for d in blocked_domains[:10]]
+                # Sort by count and get top 10
+                sorted_domains = sorted(blocked_domains.items(), key=lambda x: x[1], reverse=True)
+                top_domain = sorted_domains[0]
+                attributes["query_count"] = top_domain[1]
+                attributes["top_10_blocked"] = [domain for domain, _ in sorted_domains[:10]]
         
         elif self._sensor_type == "top_queried_domain":
-            stats_domains = self.coordinator.data.get("stats_domains", {})
-            queried_domains = stats_domains.get("queried_domains", [])
+            devices_data = self.coordinator.data.get("devices", {})
+            devices_list = devices_data.get("devices", [])
+            
+            # Collect all queried domains from all devices
+            queried_domains = {}
+            for device in devices_list:
+                device_stats = device.get("statistics", {})
+                top_queried = device_stats.get("top_queried_domains", [])
+                for domain_info in top_queried:
+                    domain = domain_info.get("domain", "")
+                    count = domain_info.get("count", 0)
+                    queried_domains[domain] = queried_domains.get(domain, 0) + count
+            
             if queried_domains:
-                top_domain = queried_domains[0]
-                attributes["query_count"] = top_domain.get("query_count", 0)
-                attributes["top_10_queried"] = [d.get("domain") for d in queried_domains[:10]]
+                # Sort by count and get top 10
+                sorted_domains = sorted(queried_domains.items(), key=lambda x: x[1], reverse=True)
+                top_domain = sorted_domains[0]
+                attributes["query_count"] = top_domain[1]
+                attributes["top_10_queried"] = [domain for domain, _ in sorted_domains[:10]]
         
         return attributes if attributes else None

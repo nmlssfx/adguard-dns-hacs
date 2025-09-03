@@ -14,7 +14,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import DOMAIN, CLIENT_ID, OAUTH_URL, SCOPES
+from .const import DOMAIN, OAUTH_URL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,6 +22,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_USERNAME): str,
         vol.Required(CONF_PASSWORD): str,
+        vol.Optional("mfa_token"): str,
     }
 )
 
@@ -32,18 +33,22 @@ async def get_tokens_from_credentials(
     """Get access and refresh tokens from username and password."""
     session = async_get_clientsession(hass)
     
-    # OAuth2 token request
+    # AdGuard DNS API token request
     data = {
-        "grant_type": "password",
-        "client_id": CLIENT_ID,
-        "client_secret": "",  # Public client, no secret required
         "username": username,
         "password": password,
-        "scope": " ".join(SCOPES),
+    }
+    
+    # Add MFA token if provided
+    if "mfa_token" in hass.data.get("temp_mfa_token", {}):
+        data["mfa_token"] = hass.data["temp_mfa_token"]["mfa_token"]
+    
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
     }
     
     try:
-        async with session.post(OAUTH_URL, data=data) as response:
+        async with session.post(OAUTH_URL, data=data, headers=headers) as response:
             if response.status == 200:
                 token_data = await response.json()
                 return {
@@ -52,7 +57,7 @@ async def get_tokens_from_credentials(
                 }
             else:
                 error_text = await response.text()
-                _LOGGER.error("OAuth2 error: %s - %s", response.status, error_text)
+                _LOGGER.error("AdGuard DNS API error: %s - %s", response.status, error_text)
                 raise InvalidAuth
     except aiohttp.ClientError as err:
         _LOGGER.error("Network error during authentication: %s", err)
@@ -72,9 +77,19 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         
         if user_input is not None:
             try:
+                # Store MFA token temporarily if provided
+                if user_input.get("mfa_token"):
+                    if "temp_mfa_token" not in self.hass.data:
+                        self.hass.data["temp_mfa_token"] = {}
+                    self.hass.data["temp_mfa_token"]["mfa_token"] = user_input["mfa_token"]
+                
                 tokens = await get_tokens_from_credentials(
                     self.hass, user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
                 )
+                
+                # Clean up temporary MFA token
+                if "temp_mfa_token" in self.hass.data:
+                    self.hass.data.pop("temp_mfa_token", None)
                 
                 await self.async_set_unique_id(user_input[CONF_USERNAME])
                 self._abort_if_unique_id_configured()

@@ -119,21 +119,25 @@ class AdGuardDNSDeviceTracker(CoordinatorEntity[AdGuardDNSDataUpdateCoordinator]
         if "filtering_enabled" in device_info:
             attributes["filtering_enabled"] = device_info["filtering_enabled"]
         
-        # Add statistics if available
-        stats_data = self.coordinator.data.get("stats_devices", {})
-        device_stats = stats_data.get("devices", {})
-        
-        if self._device_id in device_stats:
-            device_stat = device_stats[self._device_id]
-            attributes["queries_count"] = device_stat.get("queries_count", 0)
-            attributes["blocked_count"] = device_stat.get("blocked_count", 0)
+        # Add statistics if available from device info
+        if "statistics" in device_info:
+            device_stats = device_info["statistics"]
+            attributes["queries_count"] = device_stats.get("queries_count", 0)
+            attributes["blocked_count"] = device_stats.get("blocked_count", 0)
             
-            queries = device_stat.get("queries_count", 0)
-            blocked = device_stat.get("blocked_count", 0)
+            queries = device_stats.get("queries_count", 0)
+            blocked = device_stats.get("blocked_count", 0)
             if queries > 0:
                 attributes["blocked_percentage"] = round((blocked / queries) * 100, 2)
             else:
                 attributes["blocked_percentage"] = 0
+        
+        # Add settings if available
+        if "settings" in device_info:
+            device_settings = device_info["settings"]
+            attributes["protection_enabled"] = device_settings.get("protection_enabled", True)
+            attributes["safe_browsing_enabled"] = device_settings.get("safe_browsing_enabled", True)
+            attributes["adult_content_enabled"] = device_settings.get("adult_content_enabled", False)
         
         return attributes
 

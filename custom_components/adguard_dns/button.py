@@ -57,17 +57,10 @@ class AdGuardDNSButton(CoordinatorEntity[AdGuardDNSDataUpdateCoordinator], Butto
 
     async def async_press(self) -> None:
         """Handle the button press."""
-        if self._button_type == "clear_query_log":
-            success = await self.coordinator.clear_query_log()
-            if success:
-                self.hass.components.persistent_notification.async_create(
-                    "Query log has been cleared successfully.",
-                    title="AdGuard DNS",
-                    notification_id="adguard_dns_clear_log",
-                )
-            else:
-                self.hass.components.persistent_notification.async_create(
-                    "Failed to clear query log. Please check your connection and try again.",
-                    title="AdGuard DNS Error",
-                    notification_id="adguard_dns_clear_log_error",
-                )
+        # Note: clear_query_log functionality is not available in the current AdGuard DNS API
+        # This button is kept for future API updates
+        self.hass.components.persistent_notification.async_create(
+            "This functionality is currently not available in the AdGuard DNS API.",
+            title="AdGuard DNS",
+            notification_id="adguard_dns_not_available",
+        )

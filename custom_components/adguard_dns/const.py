@@ -4,22 +4,17 @@ DOMAIN = "adguard_dns"
 
 # API URLs
 API_BASE_URL = "https://api.adguard-dns.io"
-OAUTH_URL = "https://auth.adguard.com/oauth/token"
+OAUTH_URL = "https://api.adguard-dns.io/oapi/v1/oauth_token"
 
-# OAuth2 Configuration
-CLIENT_ID = "adguard-dns-client"
-SCOPES = ["profile", "adguard-dns"]
+# Authentication Configuration
+# AdGuard DNS API uses simple username/password authentication
 
 # API Endpoints
 API_ENDPOINTS = {
-    "query_log": "/v1/query_log",
-    "stats_time": "/v1/stats/time",
-    "stats_companies": "/v1/stats/companies",
-    "stats_countries": "/v1/stats/countries",
-    "stats_devices": "/v1/stats/devices",
-    "stats_domains": "/v1/stats/domains",
-    "devices": "/v1/devices",
-    "profile": "/v1/profile",
+    "account_limits": "/oapi/v1/account/limits",
+    "devices": "/oapi/v1/devices",
+    "dns_servers": "/oapi/v1/dns_servers",
+    "dedicated_addresses": "/oapi/v1/dedicated_addresses/ipv4",
 }
 
 # Sensor Types
@@ -71,12 +66,8 @@ BINARY_SENSOR_TYPES = {
 }
 
 # Button Types
-BUTTON_TYPES = {
-    "clear_query_log": {
-        "name": "Clear Query Log",
-        "icon": "mdi:delete-sweep",
-    },
-}
+# Note: Clear Query Log functionality is not available in current AdGuard DNS API
+BUTTON_TYPES = {}
 
 # Device Tracker Types
 DEVICE_TRACKER_TYPES = {
@@ -92,4 +83,4 @@ MIN_UPDATE_INTERVAL = 60  # 1 minute
 MAX_UPDATE_INTERVAL = 3600  # 1 hour
 
 # Platforms
-PLATFORMS = ["sensor", "binary_sensor", "button", "device_tracker"]
+PLATFORMS = ["sensor", "binary_sensor", "device_tracker"]
