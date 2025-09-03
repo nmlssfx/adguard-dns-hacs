@@ -1,0 +1,66 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "AdGuard DNS",
+        "description": "Enter your AdGuard DNS credentials",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "invalid_auth": "Invalid authentication",
+      "unknown": "Unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "Account is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "AdGuard DNS Options",
+        "data": {
+          "update_interval": "Update interval (seconds)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "total_queries": {
+        "name": "Total Queries"
+      },
+      "blocked_queries": {
+        "name": "Blocked Queries"
+      },
+      "blocked_percentage": {
+        "name": "Blocked Percentage"
+      },
+      "top_blocked_domain": {
+        "name": "Top Blocked Domain"
+      },
+      "top_queried_domain": {
+        "name": "Top Queried Domain"
+      }
+    },
+    "binary_sensor": {
+      "protection_enabled": {
+        "name": "Protection Enabled"
+      }
+    },
+    "button": {
+      "clear_query_log": {
+        "name": "Clear Query Log"
+      }
+    },
+    "device_tracker": {
+      "adguard_device": {
+        "name": "AdGuard Device"
+      }
+    }
+  }
+}

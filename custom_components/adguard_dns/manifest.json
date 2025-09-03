@@ -1,0 +1,13 @@
+{
+  "domain": "adguard_dns",
+  "name": "AdGuard DNS",
+  "codeowners": ["@nmlssfx"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/nmlssfx/adguard-dns-hacs",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/nmlssfx/adguard-dns-hacs/issues",
+  "requirements": ["aiohttp>=3.8.0"],
+  "version": "1.2.0"
+}

@@ -1,0 +1,66 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "AdGuard DNS",
+        "description": "Введите ваши учетные данные AdGuard DNS",
+        "data": {
+          "username": "Имя пользователя",
+          "password": "Пароль"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Не удалось подключиться",
+      "invalid_auth": "Неверная аутентификация",
+      "unknown": "Произошла неожиданная ошибка"
+    },
+    "abort": {
+      "already_configured": "Аккаунт уже настроен"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Настройки AdGuard DNS",
+        "data": {
+          "update_interval": "Интервал обновления (секунды)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "total_queries": {
+        "name": "Всего запросов"
+      },
+      "blocked_queries": {
+        "name": "Заблокированных запросов"
+      },
+      "blocked_percentage": {
+        "name": "Процент блокировки"
+      },
+      "top_blocked_domain": {
+        "name": "Топ заблокированный домен"
+      },
+      "top_queried_domain": {
+        "name": "Топ запрашиваемый домен"
+      }
+    },
+    "binary_sensor": {
+      "protection_enabled": {
+        "name": "Защита включена"
+      }
+    },
+    "button": {
+      "clear_query_log": {
+        "name": "Очистить журнал запросов"
+      }
+    },
+    "device_tracker": {
+      "adguard_device": {
+        "name": "Устройство AdGuard"
+      }
+    }
+  }
+}
