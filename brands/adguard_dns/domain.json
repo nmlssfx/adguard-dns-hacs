@@ -1,0 +1,10 @@
+{
+  "domain": "adguard_dns",
+  "name": "AdGuard DNS",
+  "integrations": {
+    "adguard_dns": {
+      "name": "AdGuard DNS",
+      "description": "Monitor and control your AdGuard DNS settings and statistics"
+    }
+  }
+}

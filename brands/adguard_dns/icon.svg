@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <defs>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Shield shape -->
+  <path d="M12 2 L4 6 L4 13 Q4 18 12 22 Q20 18 20 13 L20 6 Z" 
+        fill="url(#iconGradient)" stroke="#1B5E20" stroke-width="0.5"/>
+  
+  <!-- DNS nodes -->
+  <circle cx="12" cy="8" r="1.5" fill="white" opacity="0.9"/>
+  <circle cx="8" cy="13" r="1.2" fill="white" opacity="0.7"/>
+  <circle cx="16" cy="13" r="1.2" fill="white" opacity="0.7"/>
+  
+  <!-- Connection lines -->
+  <line x1="12" y1="9.5" x2="8" y2="11.8" stroke="white" stroke-width="0.8" opacity="0.8"/>
+  <line x1="12" y1="9.5" x2="16" y2="11.8" stroke="white" stroke-width="0.8" opacity="0.8"/>
+  
+  <!-- Protection checkmark -->
+  <path d="M10 16 L11.5 17.5 L15 14" stroke="white" stroke-width="1" fill="none" stroke-linecap="round"/>
+</svg>
